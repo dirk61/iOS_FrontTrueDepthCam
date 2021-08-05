@@ -12,7 +12,7 @@ An example using ARVideoKit for simultaneous Front Camera TrueDepth Map Capture 
 
 
 
-<img src="https://github.com/dirk61/iOS_FrontTrueDepthCam/blob/master/images/IMG_3965.PNG" style="zoom:30%;" />
+<img src="https://github.com/dirk61/iOS_FrontTrueDepthCam/blob/master/images/IMG_3965.PNG" style="zoom:30%"/>
 
 
 
