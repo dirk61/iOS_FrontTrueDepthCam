@@ -12,7 +12,7 @@ An example using ARVideoKit for simultaneous Front Camera TrueDepth Map Capture 
 
 
 
-<img src="/Users/gix/Downloads/IMG_3964.PNG" alt="IMG_3964" style="zoom:30%;" />
+<img src="https://github.com/dirk61/iOS_FrontTrueDepthCam/blob/master/IMG_3965.PNG" style="zoom:30%;" />
 
 
 
@@ -20,4 +20,4 @@ An example using ARVideoKit for simultaneous Front Camera TrueDepth Map Capture 
 
 Follow the instructions in the Jupiter notebook. You can retrieve all the frames in arrays and do whatever you want, e.g. generate a depth video.
 
-<img src="/Users/gix/Downloads/Research/GIX/iOS_BackLidarCam/Examples/iOS_BackLidarCam/images/c4009b90-529c-4f15-85d7-924b95d1777c.png"/>
+<img src="https://github.com/dirk61/iOS_FrontTrueDepthCam/blob/master/c4009b90-529c-4f15-85d7-924b95d1777c.png" />
