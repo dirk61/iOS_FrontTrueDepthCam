@@ -15,7 +15,7 @@ import Compression
 
 class DepthCapture {
     let kErrorDomain = "DepthCapture"
-    let maxNumberOfFrame = 2000
+    let maxNumberOfFrame = 4000
     lazy var bufferSize = 640 * 480 * 2 * maxNumberOfFrame  // maxNumberOfFrame frames
     var dstBuffer: UnsafeMutablePointer<UInt8>?
     var frameCount: Int64 = 0

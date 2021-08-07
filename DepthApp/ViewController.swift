@@ -19,6 +19,7 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     var previewLayer = AVCaptureVideoPreviewLayer()
     var timestamps: String = ""
     var isRecording = false
+    var recordingTime = 0
     
     private let depthDataOutput = AVCaptureDepthDataOutput()
     private let dataOutputQueue = DispatchQueue(label: "dataOutputQueue")
@@ -27,15 +28,18 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     private var outputSynchronizer: AVCaptureDataOutputSynchronizer?
     
     @IBOutlet var cameraView: UIView!
+    @IBOutlet weak var TextView: UITextField!
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
         if let device = AVCaptureDevice.default(.builtInTrueDepthCamera,
                                                 for: .video, position: .front) {
-                
+            
             do {
                 
                 let input = try AVCaptureDeviceInput(device: device )
-              
+                
                 if captureSession.canAddInput(input){
                     captureSession.sessionPreset = AVCaptureSession.Preset.photo
                     captureSession.addInput(input)
@@ -82,7 +86,7 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
                         print("No AVCaptureConnection")
                     }
                     
-                    depthCapture.prepareForRecording()
+                    //                    depthCapture.prepareForRecording()
                     
                     // TODO: Do we need to synchronize the video and depth outputs?
                     //outputSynchronizer = AVCaptureDataOutputSynchronizer(dataOutputs: [sessionOutput, depthDataOutput])
@@ -99,6 +103,9 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     }
     
     func startRecording(){
+        depthCapture.prepareForRecording()
+        
+        
         let formatter = DateFormatter()
         formatter.dateStyle = .full
         formatter.timeStyle = .full
@@ -112,7 +119,30 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
         print(fileUrl.absoluteString)
         print("Recording started")
         self.isRecording = true
+
         
+        
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            print("timer fired!")
+            
+            self.recordingTime += 1
+            var remainder = "\(self.recordingTime % 60)"
+            if (self.recordingTime % 60 < 10)
+            {
+                remainder = "0\(self.recordingTime % 60)"
+            }
+            self.TextView.text = String("录制时间:0\(Int(self.recordingTime/60)):\(remainder)")
+//            print(timeLeft)
+            
+            if (!self.isRecording){
+                timer.invalidate()
+                self.recordingTime = 0
+                self.TextView.text = "录制时间:00:00"
+                let alertController = UIAlertController(title: "完成录制", message: "录制完成。文件已保存！", preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
+                self.present(alertController, animated: true, completion: nil)
+            }
+        }
     }
     
     func stopRecording(){
@@ -142,11 +172,17 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     }
     
     @IBAction func startPressed(_ sender: Any) {
-        startRecording()
+        if (!self.isRecording)
+        {
+            startRecording()
+        }
     }
     
     @IBAction func stopPressed(_ sender: Any) {
-        stopRecording()
+        if (self.isRecording)
+        {
+            stopRecording()
+        }
     }
     
     func depthDataOutput(_ output: AVCaptureDepthDataOutput, didOutput depthData: AVDepthData, timestamp: CMTime, connection: AVCaptureConnection) {
