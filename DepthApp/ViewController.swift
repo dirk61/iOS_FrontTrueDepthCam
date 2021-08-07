@@ -142,6 +142,19 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
                 alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
                 self.present(alertController, animated: true, completion: nil)
             }
+            
+            if (self.recordingTime == 180)
+            {
+                timer.invalidate()
+                self.recordingTime = 0
+                self.TextView.text = "录制时间:00:00"
+                let alertController = UIAlertController(title: "达到录制时长上限", message: "录制三分钟，达到录制上线。文件已自动保存！", preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
+                self.present(alertController, animated: true, completion: nil)
+                
+                self.isRecording = false
+                self.stopRecording()
+            }
         }
     }
     
