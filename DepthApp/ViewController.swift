@@ -8,7 +8,7 @@
 
 import UIKit
 import AVFoundation
-
+import Accelerate
 class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AVCaptureDepthDataOutputDelegate {
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
     }
@@ -20,6 +20,10 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     var timestamps: String = ""
     var isRecording = false
     var recordingTime = 0
+    var refreshcount = 0
+    var depth = ""
+    var depthnum = 0.0
+    var warningString = ""
     
     private let depthDataOutput = AVCaptureDepthDataOutput()
     private let dataOutputQueue = DispatchQueue(label: "dataOutputQueue")
@@ -30,9 +34,37 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     @IBOutlet var cameraView: UIView!
     @IBOutlet weak var TextView: UITextField!
     
+    @IBOutlet weak var DistanceText: UITextField!
+    @IBOutlet weak var imageView: UIImageView!
     
+    @IBOutlet weak var WarningText: UITextField!
     
     override func viewWillAppear(_ animated: Bool) {
+        TextView.isEnabled = false
+        WarningText.isEnabled = false
+        DistanceText.isEnabled = false
+        let alertController = UIAlertController(title: "使用须知", message: "在录制开始前，将脸部", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
+        self.present(alertController, animated: true, completion: nil)
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 280, height: 250))
+
+            let img = renderer.image { ctx in
+                let rect = CGRect(x: 45, y: 0, width: 190, height: 245)
+
+                // 6
+                if #available(iOS 13.0, *) {
+                    ctx.cgContext.setFillColor(CGColor(red: 0, green: 0, blue: 0, alpha: 0))
+                } else {
+                    // Fallback on earlier versions
+                }
+                ctx.cgContext.setStrokeColor(UIColor.systemBlue.cgColor)
+                ctx.cgContext.setLineWidth(3)
+
+                ctx.cgContext.addEllipse(in: rect)
+                ctx.cgContext.drawPath(using: .fillStroke)
+            }
+
+            imageView.image = img
         if let device = AVCaptureDevice.default(.builtInTrueDepthCamera,
                                                 for: .video, position: .front) {
             
@@ -99,9 +131,26 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
             } catch {
                 print("Error")
             }
+            changeText()
         }
     }
-    
+    func changeText(){
+        
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
+            self.DistanceText.text = "距离屏幕" + self.depth + "cm"
+            if (self.depthnum < 31){
+                self.WarningText.text = "离屏幕过近！"
+            }
+            else if (self.depthnum > 39){
+                self.WarningText.text = "离屏幕过远！"
+            }
+            else{
+                self.WarningText.text = ""
+            }
+        }
+        
+        
+    }
     func startRecording(){
         depthCapture.prepareForRecording()
         
@@ -119,7 +168,7 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
         print(fileUrl.absoluteString)
         print("Recording started")
         self.isRecording = true
-
+        
         
         
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
@@ -132,7 +181,7 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
                 remainder = "0\(self.recordingTime % 60)"
             }
             self.TextView.text = String("录制时间:0\(Int(self.recordingTime/60)):\(remainder)")
-//            print(timeLeft)
+            //            print(timeLeft)
             
             if (!self.isRecording){
                 timer.invalidate()
@@ -200,10 +249,36 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     
     func depthDataOutput(_ output: AVCaptureDepthDataOutput, didOutput depthData: AVDepthData, timestamp: CMTime, connection: AVCaptureConnection) {
         // Write depth data to a file
+        let ddm = depthData.depthDataMap
         if(self.isRecording) {
-            let ddm = depthData.depthDataMap
+            
             depthCapture.addPixelBuffers(pixelBuffer: ddm)
             timestamps = timestamps + String(Int(Date().timeIntervalSince1970 * 1000)) + "\n"
         }
+        CVPixelBufferLockBaseAddress(ddm, .readOnly)
+        let rowData = CVPixelBufferGetBaseAddress(ddm)! + Int(320) * CVPixelBufferGetBytesPerRow(ddm)
+        
+        var f16Pixel = rowData.assumingMemoryBound(to: UInt16.self)[Int(240)]
+        var f32Pixel = Float(0.0)
+        
+        CVPixelBufferUnlockBaseAddress(ddm, .readOnly)
+        
+        withUnsafeMutablePointer(to: &f16Pixel){
+            f16RawPointer in
+            withUnsafeMutablePointer(to: &f32Pixel){
+                f32RawPointer in
+                var src = vImage_Buffer(data: f16RawPointer, height: 1, width: 1, rowBytes: 2)
+                var dist = vImage_Buffer(data: f32RawPointer, height: 1, width: 1, rowBytes: 4)
+                vImageConvert_Planar16FtoPlanarF(&src, &dist, 0)
+            }
+        }
+        let depthString = String(format: "%.2f", f32Pixel * 100)
+        //        print(depthString)
+        if depthString != "nan"
+        {
+        depth = depthString
+        depthnum = Double(f32Pixel * 100)
+        }
     }
 }
+
