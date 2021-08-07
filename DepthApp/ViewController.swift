@@ -27,7 +27,7 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     
     private let depthDataOutput = AVCaptureDepthDataOutput()
     private let dataOutputQueue = DispatchQueue(label: "dataOutputQueue")
-    private let depthCapture = DepthCapture()
+    private var depthCapture = DepthCapture()
     
     private var outputSynchronizer: AVCaptureDataOutputSynchronizer?
     
@@ -38,14 +38,17 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     @IBOutlet weak var imageView: UIImageView!
     
     @IBOutlet weak var WarningText: UITextField!
-    
+
+    override func viewDidAppear(_ animated: Bool) {
+        let alertController = UIAlertController(title: "使用须知", message: "在录制开始前，将脸部放入蓝色圆内。保持脸部距离手机35cm左右。录制时，尽量保持静止。", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
+        self.present(alertController, animated: true, completion: nil)
+    }
     override func viewWillAppear(_ animated: Bool) {
         TextView.isEnabled = false
         WarningText.isEnabled = false
         DistanceText.isEnabled = false
-        let alertController = UIAlertController(title: "使用须知", message: "在录制开始前，将脸部", preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
-        self.present(alertController, animated: true, completion: nil)
+        
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 280, height: 250))
 
             let img = renderer.image { ctx in
@@ -230,7 +233,8 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
         } catch {
             print("Error while finishing depth capture.")
         }
-        
+
+//        depthCapture = DepthCapture()
     }
     
     @IBAction func startPressed(_ sender: Any) {
