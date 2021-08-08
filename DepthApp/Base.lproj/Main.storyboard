@@ -87,6 +87,8 @@
                     </view>
                     <connections>
                         <outlet property="DistanceText" destination="Xh7-LO-xE7" id="FcG-Z8-7do"/>
+                        <outlet property="Instruct1" destination="vIz-Dl-RI4" id="Ivz-Fb-tjR"/>
+                        <outlet property="Instruct2" destination="VH7-jo-Sdq" id="eE9-0A-cNU"/>
                         <outlet property="TextView" destination="PI2-jI-HeJ" id="Q2H-ea-WJA"/>
                         <outlet property="WarningText" destination="seX-1s-YMn" id="XCv-Fj-bdK"/>
                         <outlet property="cameraView" destination="W9r-8b-iys" id="ipe-o3-puU"/>

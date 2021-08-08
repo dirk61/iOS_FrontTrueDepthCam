@@ -38,7 +38,9 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     @IBOutlet weak var imageView: UIImageView!
     
     @IBOutlet weak var WarningText: UITextField!
-
+    @IBOutlet weak var Instruct1: UITextView!
+    @IBOutlet weak var Instruct2: UITextView!
+    
     override func viewDidAppear(_ animated: Bool) {
         let alertController = UIAlertController(title: "使用须知", message: "在录制开始前，将脸部放入蓝色圆内。保持脸部距离手机35cm左右。录制时，尽量保持静止。", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
@@ -48,7 +50,8 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
         TextView.isEnabled = false
         WarningText.isEnabled = false
         DistanceText.isEnabled = false
-        
+        Instruct1.isEditable = false
+        Instruct2.isEditable = false
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 280, height: 250))
 
             let img = renderer.image { ctx in
