@@ -164,7 +164,7 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
         let formatter = DateFormatter()
         formatter.dateStyle = .full
         formatter.timeStyle = .full
-        formatter.dateFormat = "yyyy-MM-dd'@'HH-mm-ssZZZZ"
+        formatter.dateFormat = "yyyy_MM_dd'_'HH_mm_ss"
         let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
         let date = Date(timeIntervalSince1970: Date().timeIntervalSince1970)
         var filePath  = "\(documentsPath)/\(formatter.string(from: date))_Video.mov"
@@ -198,12 +198,12 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
                 self.present(alertController, animated: true, completion: nil)
             }
             
-            if (self.recordingTime == 180)
+            if (self.recordingTime == 300)
             {
                 timer.invalidate()
                 self.recordingTime = 0
                 self.TextView.text = "录制时间:00:00"
-                let alertController = UIAlertController(title: "达到录制时长上限", message: "录制三分钟，达到录制上线。文件已自动保存！", preferredStyle: .alert)
+                let alertController = UIAlertController(title: "达到录制时长上限", message: "录制五分钟，达到录制上线。文件已自动保存！", preferredStyle: .alert)
                 alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
                 self.present(alertController, animated: true, completion: nil)
                 
@@ -217,7 +217,7 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
         let formatter = DateFormatter()
         formatter.dateStyle = .full
         formatter.timeStyle = .full
-        formatter.dateFormat = "yyyy-MM-dd'@'HH-mm-ssZZZZ"
+        formatter.dateFormat = "yyyy_MM_dd'_'HH_mm_ss"
         let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
         let date = Date(timeIntervalSince1970: Date().timeIntervalSince1970)
         var txtPath  = "\(documentsPath)/\(formatter.string(from: date))_DepthTimeStamp.txt"

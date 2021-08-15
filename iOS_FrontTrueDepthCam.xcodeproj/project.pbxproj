@@ -17,7 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F019923D22395746003F6D32 /* iOS_FrontTrueDepthCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOS_FrontTrueDepthCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F019923D22395746003F6D32 /* 前置摄像头.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "前置摄像头.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F019924022395746003F6D32 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F019924222395746003F6D32 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		F019924522395746003F6D32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -50,7 +50,7 @@
 		F019923E22395746003F6D32 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F019923D22395746003F6D32 /* iOS_FrontTrueDepthCam.app */,
+				F019923D22395746003F6D32 /* 前置摄像头.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -87,7 +87,7 @@
 			);
 			name = iOS_FrontTrueDepthCam;
 			productName = DepthApp;
-			productReference = F019923D22395746003F6D32 /* iOS_FrontTrueDepthCam.app */;
+			productReference = F019923D22395746003F6D32 /* 前置摄像头.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -298,7 +298,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.exdepth;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "前置摄像头";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -316,7 +316,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.exdepth;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "前置摄像头";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
