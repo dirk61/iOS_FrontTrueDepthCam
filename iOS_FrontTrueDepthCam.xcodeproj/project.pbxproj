@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5BA840E3274A907C00927989 /* UDPConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA840E2274A907C00927989 /* UDPConnection.swift */; };
+		5BA840E5274A908B00927989 /* UDPError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA840E4274A908B00927989 /* UDPError.swift */; };
 		F019924122395746003F6D32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F019924022395746003F6D32 /* AppDelegate.swift */; };
 		F019924322395746003F6D32 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F019924222395746003F6D32 /* ViewController.swift */; };
 		F019924622395746003F6D32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F019924422395746003F6D32 /* Main.storyboard */; };
@@ -17,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5BA840E2274A907C00927989 /* UDPConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPConnection.swift; sourceTree = "<group>"; };
+		5BA840E4274A908B00927989 /* UDPError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPError.swift; sourceTree = "<group>"; };
 		F019923D22395746003F6D32 /* 前置摄像头.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "前置摄像头.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F019924022395746003F6D32 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F019924222395746003F6D32 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -66,6 +70,8 @@
 				F019924F22395748003F6D32 /* Info.plist */,
 				F019924722395746003F6D32 /* DepthApp.xcdatamodeld */,
 				F0DCF165224CDDAB00A1AA5E /* DepthCapture.swift */,
+				5BA840E2274A907C00927989 /* UDPConnection.swift */,
+				5BA840E4274A908B00927989 /* UDPError.swift */,
 			);
 			path = DepthApp;
 			sourceTree = "<group>";
@@ -143,6 +149,8 @@
 			files = (
 				F019924322395746003F6D32 /* ViewController.swift in Sources */,
 				F019924122395746003F6D32 /* AppDelegate.swift in Sources */,
+				5BA840E5274A908B00927989 /* UDPError.swift in Sources */,
+				5BA840E3274A907C00927989 /* UDPConnection.swift in Sources */,
 				F0DCF166224CDDAB00A1AA5E /* DepthCapture.swift in Sources */,
 				F019924922395746003F6D32 /* DepthApp.xcdatamodeld in Sources */,
 			);
