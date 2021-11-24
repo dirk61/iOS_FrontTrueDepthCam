@@ -9,6 +9,8 @@
 import UIKit
 import AVFoundation
 import Accelerate
+import Network
+import CloudKit
 class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AVCaptureDepthDataOutputDelegate {
     func fileOutput(_ output: AVCaptureFileOutput, didFinishRecordingTo outputFileURL: URL, from connections: [AVCaptureConnection], error: Error?) {
     }
@@ -24,10 +26,15 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     var depth = ""
     var depthnum = 0.0
     var warningString = ""
+    var isControlledRecording = false
+    var startedControlledRecording = false
     
     private let depthDataOutput = AVCaptureDepthDataOutput()
     private let dataOutputQueue = DispatchQueue(label: "dataOutputQueue")
     private var depthCapture = DepthCapture()
+    
+    private var udpconnection : UDPBroadcastConnection!
+    var broadcastStat = ""
     
     private var outputSynchronizer: AVCaptureDataOutputSynchronizer?
     
@@ -40,18 +47,147 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     @IBOutlet weak var WarningText: UITextField!
     @IBOutlet weak var Instruct1: UITextView!
     @IBOutlet weak var Instruct2: UITextView!
+
+    
+    var listener: NWListener?
     
     override func viewDidAppear(_ animated: Bool) {
         let alertController = UIAlertController(title: "使用须知", message: "在录制开始前，将脸部放入蓝色圆内。保持脸部距离手机35cm左右。录制时，尽量保持静止。", preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Confirm", style: .default, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+     
+        
+    }
+    func getIPAddress() -> String {
+        var address: String?
+        var ifaddr: UnsafeMutablePointer<ifaddrs>? = nil
+        if getifaddrs(&ifaddr) == 0 {
+            var ptr = ifaddr
+            while ptr != nil {
+                defer { ptr = ptr?.pointee.ifa_next }
+
+                guard let interface = ptr?.pointee else { return "" }
+                let addrFamily = interface.ifa_addr.pointee.sa_family
+                if addrFamily == UInt8(AF_INET) || addrFamily == UInt8(AF_INET6) {
+
+                    // wifi = ["en0"]
+                    // wired = ["en2", "en3", "en4"]
+                    // cellular = ["pdp_ip0","pdp_ip1","pdp_ip2","pdp_ip3"]
+
+                    let name: String = String(cString: (interface.ifa_name))
+                    if  name == "en0" || name == "en2" || name == "en3" || name == "en4" || name == "pdp_ip0" || name == "pdp_ip1" || name == "pdp_ip2" || name == "pdp_ip3" {
+                        var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                        getnameinfo(interface.ifa_addr, socklen_t((interface.ifa_addr.pointee.sa_len)), &hostname, socklen_t(hostname.count), nil, socklen_t(0), NI_NUMERICHOST)
+                        address = String(cString: hostname)
+                    }
+                }
+            }
+            freeifaddrs(ifaddr)
+        }
+        return address ?? ""
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
+        
+        
         TextView.isEnabled = false
         WarningText.isEnabled = false
         DistanceText.isEnabled = false
         Instruct1.isEditable = false
         Instruct2.isEditable = false
+
+      
+        
+        do {
+            listener = try NWListener(using: .udp, on: 3600)
+        } catch {
+            print("exception upon creating listener")
+        }
+        
+        listener?.stateUpdateHandler = {(newState) in
+            switch newState {
+            case .ready:
+                print("ready")
+                self.broadcastStat = "连接成功"
+            default:
+                break
+            }
+        }
+        
+        listener?.newConnectionHandler = {(newConnection) in
+            newConnection.stateUpdateHandler = {newState in
+                switch newState {
+                case .setup:
+                                   print("Listener: Setup")
+               case .waiting(let error):
+                    self.broadcastStat = "连接失败"
+                   print("Listener: Waiting \(error)")
+                case .ready:
+                    print("connection ready")
+                    
+                    
+                    let strIPAddress : String = self.getIPAddress()
+                    if strIPAddress.isEmpty
+                    {print("连接失败")
+                        self.broadcastStat = "连接失败"
+//                        self.BroadCastView.text = "连接失败"
+                    }
+                    else{print("连接成功")
+                        self.broadcastStat = "连接成功"
+//                        self.BroadCastView.text = "成功连接"
+                    }
+                    print("IPAddress :: \(strIPAddress)")
+                    newConnection.receiveMessage { (data, context, isComplete, error) in
+                        let stringValue = String(decoding: data!, as: UTF8.self)
+                        if !stringValue.isEmpty
+                        {
+                            if stringValue == "true"
+                            {print("开始录制")
+                                
+                                
+                                
+                                
+                                self.broadcastStat = "开始录制"
+                                if (!self.isControlledRecording)
+                                {
+                                    self.startRecording()
+                                }
+                                
+                                self.isControlledRecording = true
+//                            self.BroadCastView.text = "开始录制"
+                            print(stringValue)
+                            }
+                                else
+                                {print("停止录制")
+                                    self.broadcastStat = "停止录制"
+                                   
+                                    if (self.isControlledRecording)
+                                    {
+                                        self.stopRecording()
+                                    }
+                                    self.isControlledRecording = false
+                                    self.startedControlledRecording = false
+//                                self.BroadCastView.text = "停止录制"
+                                print(stringValue)
+                                }
+                        }
+                        
+                        
+                    }
+                default:
+                    break
+                }
+            }
+            newConnection.start(queue: DispatchQueue(label: "newconn"))
+        }
+        
+        listener?.start(queue: .main)
+        
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 280, height: 250))
 
             let img = renderer.image { ctx in
@@ -143,7 +279,7 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
     func changeText(){
         
         Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
-            self.DistanceText.text = "距离屏幕" + self.depth + "cm"
+            self.DistanceText.text = "距离屏幕" + self.depth + "cm  " + self.broadcastStat
             if (self.depthnum < 31){
                 self.WarningText.text = "离屏幕过近！"
             }
@@ -153,6 +289,35 @@ class ViewController: UIViewController, AVCaptureFileOutputRecordingDelegate, AV
             else{
                 self.WarningText.text = ""
             }
+            print(self.isRecording)
+            //start timer
+            if self.isControlledRecording && !self.startedControlledRecording{
+                self.startedControlledRecording = true
+            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+                print("timer fired!")
+                
+                self.recordingTime += 1
+                var remainder = "\(self.recordingTime % 60)"
+                if (self.recordingTime % 60 < 10)
+                {
+                    remainder = "0\(self.recordingTime % 60)"
+                }
+                self.TextView.text = String("录制时间:0\(Int(self.recordingTime/60)):\(remainder)")
+                //            print(timeLeft)
+                
+                if (!self.isControlledRecording){
+                    timer.invalidate()
+                    self.recordingTime = 0
+                    self.TextView.text = "录制时间:00:00"
+                    
+                }
+                
+                
+            }
+            }
+            
+            //end timer
+            
         }
         
         
